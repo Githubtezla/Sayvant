@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sayvant</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">Sayvant</div>
+        <div class="status" id="status"><span class="dot"></span><span id="status-text">…</span></div>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-foot">
+      <div class="links" id="foot-links"></div>
+      <div id="version"></div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="waves" aria-hidden="true">
+      <svg viewBox="0 0 1000 260" preserveAspectRatio="none">
+        <path d="M0 70 C 220 20, 380 140, 620 80 S 900 30, 1000 90"/>
+        <path d="M0 120 C 260 60, 420 190, 660 120 S 920 70, 1000 140"/>
+        <path d="M0 175 C 240 120, 470 240, 700 170 S 930 130, 1000 190"/>
+      </svg>
+    </div>
+    <div class="content" id="content"><div class="loading">…</div></div>
+    <div class="savebar" id="savebar" hidden></div>
+  </main>
+</div>
+<div class="toasts" id="toasts"></div>
+<div class="modal-backdrop" id="modal" hidden></div>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

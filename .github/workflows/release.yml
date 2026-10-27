@@ -1,0 +1,144 @@
+# Builds Sayvant.exe, the installer and a portable ZIP and creates a draft release.
+# Triggered by a tag like v0.2.0 (must match sayvant/__init__.py) or manually
+# (Actions, Release, Run workflow). A manual run is a test run: it builds everything and
+# keeps the files as the artifact "sayvant-<version>", but creates no release.
+#
+# Signing through SignPath is prepared and only runs when the repository has the variable
+# SIGNPATH_ORGANIZATION_ID and the secret SIGNPATH_API_TOKEN (see docs/SIGNING.md),
+# always for tags, for manual runs only with the "sign" option.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      sign:
+        description: "Also sign through SignPath on this manual run"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    env:
+      SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' && (github.ref_type == 'tag' || inputs.sign) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies (pinned in constraints.txt)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller -c constraints.txt
+          python -m pip check
+
+      - name: Check source code
+        run: python -m compileall -q sayvant
+
+      - name: Prepare version and icon
+        shell: pwsh
+        run: |
+          $v = (python packaging/prepare.py).Trim()
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and "v$v" -ne $env:GITHUB_REF_NAME) {
+            throw "Tag $env:GITHUB_REF_NAME does not match version $v in sayvant/__init__.py"
+          }
+          "VERSION=$v" >> $env:GITHUB_ENV
+
+      - name: Build Sayvant.exe
+        run: python -m PyInstaller packaging/sayvant.spec --noconfirm --clean --distpath dist --workpath build/pyinstaller
+
+      - name: Check program folder
+        shell: pwsh
+        run: |
+          $need = @(
+            'dist\Sayvant\Sayvant.exe',
+            'dist\Sayvant\_internal\sayvant\webui\index.html',
+            'dist\Sayvant\_internal\sayvant\webui\app.js',
+            'dist\Sayvant\_internal\onnx_asr',
+            'dist\Sayvant\_internal\onnxruntime',
+            'dist\Sayvant\_internal\pythonnet',
+            'dist\Sayvant\_internal\webview\lib\Microsoft.Web.WebView2.Core.dll',
+            'dist\Sayvant\_internal\_sounddevice_data'
+          )
+          $missing = $need | Where-Object { -not (Test-Path $_) }
+          if ($missing) { throw "Missing in program folder: $($missing -join ', ')" }
+          $mb = [math]::Round((Get-ChildItem dist\Sayvant -Recurse -File | Measure-Object Length -Sum).Sum / 1MB)
+          "Program folder complete, $mb MB"
+
+      - name: Upload program folder
+        id: upload-app
+        uses: actions/upload-artifact@v7
+        with:
+          name: sayvant-app-unsigned
+          path: dist/Sayvant
+
+      - name: Sign Sayvant.exe (SignPath)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: sayvant
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: app
+          github-artifact-id: ${{ steps.upload-app.outputs.artifact-id }}
+          wait-for-completion: true
+          # Every request is approved manually, so wait up to an hour
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: dist/Sayvant
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Build installer and portable ZIP
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$env:VERSION" packaging\sayvant.iss
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed" }
+          Compress-Archive -Path dist\Sayvant -DestinationPath "dist\Sayvant-$env:VERSION-portable.zip"
+          New-Item -ItemType Directory -Force out | Out-Null
+          Move-Item "dist\Sayvant-Setup-$env:VERSION.exe" out\
+          Move-Item "dist\Sayvant-$env:VERSION-portable.zip" out\
+
+      - name: Upload installer
+        id: upload-setup
+        uses: actions/upload-artifact@v7
+        with:
+          name: sayvant-setup-unsigned
+          path: out/Sayvant-Setup-*.exe
+
+      - name: Sign installer (SignPath)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: sayvant
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.upload-setup.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: out
+
+      - name: Keep results
+        uses: actions/upload-artifact@v7
+        with:
+          name: sayvant-${{ env.VERSION }}
+          path: out/*
+
+      - name: Create draft release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          name: Sayvant ${{ env.VERSION }}
+          files: out/*
