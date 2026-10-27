@@ -85,7 +85,7 @@ Dann richtig diktieren:
 - Für längere Texte während des Haltens die **Leertaste** drücken. Die Aufnahme läuft freihändig weiter, bis du die rechte Strg-Taste erneut drückst oder auf die Anzeige klickst.
 - Doch nicht? Während der Aufnahme **Esc** drücken.
 
-Die Einstellungen öffnen sich jederzeit mit einem Klick auf das Sayvant-Symbol im Infobereich. Ein Rechtsklick öffnet das Menü mit schnellen Umschaltern für Erkennung und Nachbearbeitung, "Letztes Diktat erneut einfügen", dem Verlauf und dem Protokoll.
+Die Einstellungen öffnen sich jederzeit mit einem Klick auf das Sayvant-Symbol im Infobereich. Ein Rechtsklick öffnet das Menü mit schnellen Umschaltern für Erkennung und Nachbearbeitung, "Letztes Diktat erneut einfügen", dem Verlauf, dem Protokoll und einem Link zu dieser Seite.
 
 ## Spracherkennung
 

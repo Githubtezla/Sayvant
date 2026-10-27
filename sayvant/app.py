@@ -464,6 +464,7 @@ class App:
             I(_("Verlauf …"), lambda icon, item: self.post(self.open_history)),
             I(_("Einstellungen …"), lambda icon, item: self.post(self.open_settings), default=True),
             I(_("Protokoll öffnen"), lambda icon, item: os.startfile(config.LOG_FILE)),  # noqa: S606
+            I(_("Sayvant auf GitHub"), lambda icon, item: os.startfile(config.REPO_URL)),  # noqa: S606
             M.SEPARATOR,
             I(_("Beenden"), lambda icon, item: self.post(self.quit)),
         )

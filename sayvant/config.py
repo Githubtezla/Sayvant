@@ -157,6 +157,8 @@ DEFAULTS: dict = {
 }
 
 OPENROUTER_BASE = "https://openrouter.ai/api/v1"
+# Projektseite: Quellcode, neue Versionen, Fehler melden
+REPO_URL = "https://github.com/Githubtezla/Sayvant"
 
 
 def key_name(profile: dict) -> str:

@@ -483,7 +483,7 @@ const RENDER = { home: pageHome, general: pageGeneral, hotkeys: pageHotkeys, eng
 function renderChrome() {
   $("#nav").innerHTML = PAGES.map(([id, label, ic]) =>
     `<button class="${S.page === id ? "active" : ""}" data-action="nav" data-page="${id}">${icon(ic)}<span>${t(label)}</span></button>`).join("");
-  $("#foot-links").innerHTML = `<button class="link" data-action="open-log">${t("Protokoll")}</button><button class="link" data-action="open-folder">${t("Datenordner")}</button>`;
+  $("#foot-links").innerHTML = `<button class="link" data-action="open-log">${t("Protokoll")}</button><button class="link" data-action="open-folder">${t("Datenordner")}</button><button class="link" data-action="open-repo" title="${esc(S.meta.repo_url)}">GitHub</button>`;
   $("#version").textContent = t("Version {v}", { v: S.meta.version });
   $("#savebar").innerHTML = `<div class="savebar-text"><span class="dotw"></span>${t("Ungespeicherte Änderungen")}</div>
     <div class="savebar-actions"><button class="btn ghost" data-action="discard">${t("Verwerfen")}</button>
@@ -638,6 +638,7 @@ const ACTIONS = {
   "open-prompt"() { api().open_prompt(); },
   "open-log"() { api().open_log(); },
   "open-folder"() { api().open_folder(); },
+  "open-repo"() { api().open_url(S.meta.repo_url); },
   "focus-chips"(el, ev) { if (ev.target === el) $("#term-input").focus(); },
   "term-del"(el) { S.cfg.dictionary.terms.splice(+el.dataset.i, 1); render(); $("#term-input").focus(); },
   "pair-add"(el) { (el.dataset.kind === "repl" ? S.repl : S.snip).push(["", ""]); writeLists(); render(); },

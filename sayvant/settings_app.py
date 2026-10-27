@@ -86,6 +86,7 @@ class Api:
             "keys": {n: keystore.has_key(n) for n in names},
             "meta": {
                 "version": __version__,
+                "repo_url": config.REPO_URL,
                 "lang": lang,
                 "windows_lang": i18n.windows_language(),
                 "ui_languages": {"auto": _("Wie Windows"), "de": "Deutsch", "en": "English"},

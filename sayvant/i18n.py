@@ -61,6 +61,7 @@ EN: dict[str, str] = {
     "Verlauf …": "History …",
     "Einstellungen …": "Settings …",
     "Protokoll öffnen": "Open log",
+    "Sayvant auf GitHub": "Sayvant on GitHub",
     "Beenden": "Quit",
     "Autostart ließ sich nicht ändern, siehe Protokoll.": "Could not change autostart, see log.",
     "Lade das Erkennungsmodell, beim ersten Mal einige hundert MB. Das kann einige Minuten dauern.":

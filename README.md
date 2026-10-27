@@ -83,7 +83,7 @@ Then dictate for real:
 - For longer texts, press **Space** while holding Right Ctrl. Recording continues hands-free until you press Right Ctrl again or click the indicator.
 - Changed your mind? Press **Esc** while recording.
 
-You can open the settings at any time with a click on the Sayvant icon in the notification area. A right-click opens the menu with quick switches for recognition and cleanup, "Paste last dictation again", the history and the log.
+You can open the settings at any time with a click on the Sayvant icon in the notification area. A right-click opens the menu with quick switches for recognition and cleanup, "Paste last dictation again", the history, the log and a link to this page.
 
 ## Speech recognition
 
